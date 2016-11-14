@@ -8,8 +8,8 @@ class TreeFinder(object):
     def __init__(self, nodes, edges):
         self.nodes = nodes
         self.edges = edges #edges are a triple: (v, w, weight v-w)
-        self.withoutweights = [set(e[:2]) for e in self.edges]    
         self.weights = self.weightsDict() #dict with key, value pairs (v, w): min weight between v and w
+        self.withoutweights = self.weights.keys()
         self.graphDict = self.adjacencyListBuilder()[0]
 
     def __str__(self):
@@ -37,16 +37,13 @@ class TreeFinder(object):
         tree_nodes = [start]
         tree_edges = []
         total_weight = 0
-        #C = {v: float("inf") for v in self.nodes}
-        #E = {v: False for v in self.nodes}
         while queue:
             min_weight = float("inf")
             for node in queue:
-                neighbours = {v for v in tree_nodes if {node, v} in self.withoutweights}
+                neighbours = {v for v in tree_nodes if v in self.graphDict[node]}
                 if neighbours:
-                    #print "edges", [(v, node) for v in neighbours]
                     cheapest_edge = min([(v, node) for v in neighbours], key=lambda x:self.weights[x])
-                    weight = self.weights[(v, node)]
+                    weight = self.weights[cheapest_edge]
                     if weight < min_weight:
                         best_node = node
                         min_weight = weight
@@ -57,9 +54,28 @@ class TreeFinder(object):
             tree_nodes.append(best_node)
             tree_edges.append(best_edge)
             total_weight += min_weight
-        return tree_edges
-            #C[best_node] = min_weight
-            #E[best_node] = best_edge
+        return total_weight
+
+
+    def minSpanningTree2(self, start):
+        total_weight = 0
+        queue = self.nodes[:]
+        queue.remove(start)
+        edges_left = [set(e[:2]) for e in self.edges]
+        tree_nodes = {start}
+        while queue:
+            possible_edges = [e for e in edges_left if bool(e&tree_nodes) and bool(e&set(queue))]
+            cheapest_edge = min(possible_edges, key=lambda x: self.weights[tuple(x)])
+            total_weight += self.weights[tuple(cheapest_edge)]
+            edges_left.remove(cheapest_edge)
+            for _ in cheapest_edge:
+                tree_nodes.add(_)
+                try:
+                    queue.remove(_)
+                except ValueError:
+                    pass
+        return total_weight
+
 
 
 
