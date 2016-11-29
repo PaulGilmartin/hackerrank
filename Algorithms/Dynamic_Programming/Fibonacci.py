@@ -36,3 +36,29 @@ def basic_fib(n):
         return 1
     return basic_fib(n - 1) + basic_fib(n - 2)
 
+
+
+
+
+class Memoize(object):
+    def __init__(self, func):
+        self.func = func
+        self.cache = {}
+
+    def __call__(self, *args):
+        if args in self.cache:
+            print(self.cache)
+            return self.cache[args]
+        ret = self.func(*args)
+        self.cache[args] = ret
+        return ret
+
+@Memoize
+def fib(n, m):
+    if n < 2:
+        return 1
+    if m<2:
+        return 1
+    return fib(n-2, m) + fib(n, m-1)
+
+
