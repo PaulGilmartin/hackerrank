@@ -60,5 +60,3 @@ def fib(n, m):
     if m<2:
         return 1
     return fib(n-2, m) + fib(n, m-1)
-
-
